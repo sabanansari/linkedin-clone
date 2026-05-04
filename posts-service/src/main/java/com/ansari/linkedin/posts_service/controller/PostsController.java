@@ -1,5 +1,6 @@
 package com.ansari.linkedin.posts_service.controller;
 
+import com.ansari.linkedin.posts_service.auth.AuthContextHolder;
 import com.ansari.linkedin.posts_service.dto.PostCreateRequestDto;
 import com.ansari.linkedin.posts_service.dto.PostDto;
 import com.ansari.linkedin.posts_service.entity.Post;
