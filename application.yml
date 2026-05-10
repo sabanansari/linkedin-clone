@@ -1,0 +1,7 @@
+auth:
+  type: disabled
+
+kafka:
+  clusters:
+    - name: local
+      bootstrapServers: localhost:9092

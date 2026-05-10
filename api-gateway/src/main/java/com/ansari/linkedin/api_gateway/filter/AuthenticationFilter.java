@@ -31,16 +31,19 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if(tokenHeader == null || !tokenHeader.startsWith("Bearer ")){
                 log.info("No token found");
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                exchange.getResponse().setComplete();
+                // ensure we return immediately so downstream does not receive a null token
+                return exchange.getResponse().setComplete();
             }
 
             final String token = tokenHeader.split("Bearer ")[1].trim();
 
             try{
                 String userId = jwtService.getUserIdFromToken(token);
+                log.debug("Extracted userId from token: {}", userId);
                 ServerWebExchange mutatedExchange = exchange.mutate()
                         .request(r -> r.header("X-User-Id", userId))
                         .build();
+                log.debug("Added X-User-Id header to exchange: {}", userId);
                 return chain.filter(mutatedExchange);
             }catch(JwtException e){
                 log.error("JWT exception: {}", e.getLocalizedMessage());

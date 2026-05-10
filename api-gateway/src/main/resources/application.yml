@@ -1,6 +1,6 @@
 spring.application.name: api-gateway
 
-server.port: 8080
+server.port: 8180
 
 jwt.secretKey: dlagvlnfalkfj3oi43io524oi4io2fdsvknsddfn34oi55o5u3rgjkdfngdf23432tgregfdfdgfsldkgdfsglsd23323rfedsv
 

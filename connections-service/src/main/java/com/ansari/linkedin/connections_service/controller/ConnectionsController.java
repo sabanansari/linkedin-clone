@@ -4,24 +4,44 @@ package com.ansari.linkedin.connections_service.controller;
 import com.ansari.linkedin.connections_service.entity.Person;
 import com.ansari.linkedin.connections_service.service.ConnectionsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/core")
 @RequiredArgsConstructor
+@Slf4j
 public class ConnectionsController {
 
     private final ConnectionsService connectionsService;
 
     @GetMapping("/{userId}/first-degree")
     public ResponseEntity<List<Person>> getFirstDegreeConnections(@PathVariable Long userId) {
-        return ResponseEntity.ok(connectionsService.getFirstDegreeConnections(userId));
+        log.info("User ID received in req:"+userId);
+        List<Person> persons = connectionsService.getFirstDegreeConnections(userId);
+        return ResponseEntity.ok(persons);
     }
+
+    @PostMapping("/request/{userId}")
+    public ResponseEntity<Void> sendConnectionRequest(@PathVariable Long userId){
+        connectionsService.sendConnectionRequest(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/accept/{userId}")
+    public ResponseEntity<Void> acceptConnectionRequest(@PathVariable Long userId){
+        connectionsService.acceptConnectionRequest(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reject/{userId}")
+    public ResponseEntity<Void> rejectConnectionRequest(@PathVariable Long userId){
+        connectionsService.rejectConnectionRequest(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

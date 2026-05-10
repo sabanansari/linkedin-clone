@@ -26,6 +26,17 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex){
+
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message(ex.getLocalizedMessage())
+                .build();
+
+        return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 //    @ExceptionHandler(AuthenticationException.class)
 //    public ResponseEntity<ApiResponse<?>> handleAuthenticationException(AuthenticationException ex){
 //        ApiError apiError = ApiError.builder()

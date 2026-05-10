@@ -5,6 +5,7 @@ import com.ansari.linkedin.user_service.dto.LoginRequestDto;
 import com.ansari.linkedin.user_service.dto.SignUpRequestDto;
 import com.ansari.linkedin.user_service.dto.UserDto;
 import com.ansari.linkedin.user_service.entity.User;
+import com.ansari.linkedin.user_service.event.UserCreatedEvent;
 import com.ansari.linkedin.user_service.exception.BadRequestException;
 import com.ansari.linkedin.user_service.exception.ResourceNotFoundException;
 import com.ansari.linkedin.user_service.repository.UserRepository;
@@ -13,6 +14,7 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +25,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final JWTService jwtService;
+    private final KafkaTemplate<Long, UserCreatedEvent> userCreatedEventKafkaTemplate;
 
     public UserDto signUp(SignUpRequestDto signUpRequestDto) {
 
@@ -34,6 +37,14 @@ public class AuthService {
         User user = modelMapper.map(signUpRequestDto, User.class);
         user.setPassword(PasswordUtil.hashPassword(signUpRequestDto.getPassword()));
         User savedUser = userRepository.save(user);
+
+        UserCreatedEvent userCretedEvent = UserCreatedEvent.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .build();
+
+        userCreatedEventKafkaTemplate.send("user_created_topic",userCretedEvent);
+
         return modelMapper.map(savedUser, UserDto.class);
     }
 
